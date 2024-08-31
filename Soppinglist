@@ -143,7 +143,7 @@ entry.pack(pady=5)
 search_entry = tk.Entry(window, width=25)
 search_entry.pack(pady=5)
 
-# Button to search for an item
+# search for an item
 search_button = tk.Button(window, text="Search Item", command=search_item)
 search_button.pack(pady=5)
 
@@ -151,7 +151,7 @@ search_button.pack(pady=5)
 add_button = tk.Button(window, text="Add Item", command=add_item)
 add_button.pack(pady=5)
 
-# Listbox to display items
+# Listbox 
 listbox = tk.Listbox(window, width=40)
 listbox.pack(pady=5)
 
@@ -159,20 +159,20 @@ listbox.pack(pady=5)
 show_button = tk.Button(window, text="Show Image", command=show_image)
 show_button.pack(pady=5)
 
-# Label to display the selected item's image
+#  display the selected item's image
 image_label = tk.Label(window)
 image_label.pack(pady=5)
 
-# Button to remove an item
+#  remove an item
 remove_button = tk.Button(window, text="Remove Item", command=remove_item)
 remove_button.pack(pady=5)
 
-# Button to clear the list
+#  to clear the lis
 clear_button = tk.Button(window, text="Clear List", command=clear_list)
 clear_button.pack(pady=5)
 
-# Display thumbnails of all images
+# Display  all images
 display_thumbnails()
 
-# Run the GUI event loop
+
 window.mainloop()
