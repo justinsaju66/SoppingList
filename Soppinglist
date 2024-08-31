@@ -1,0 +1,178 @@
+import tkinter as tk
+from tkinter import messagebox
+from PIL import Image, ImageTk
+import os
+
+window = tk.Tk()
+window.title("Shopping List with Images")
+window.geometry("1000x1000")  # Increase window size to accommodate image grid
+
+# List items
+shopping_list = []
+
+# List of image
+image_paths = {
+    'telephone': r"C:\Users\justi\Desktop\justi\exm\shopping\telephone.jpg",
+    'lap': r"C:\Users\justi\Desktop\justi\exm\shopping\lap.jpeg",
+    'camera':r"C:\Users\justi\Desktop\justi\exm\shopping\camera.jpg"
+}
+
+thumbnail_frame = tk.Frame(window)
+thumbnail_frame.pack(pady=10)
+
+# for size if the image
+def create_thumbnail(image_path, size=(100, 100)):
+    img = Image.open(image_path)
+    img.thumbnail(size)  # Resize image to thumbnail size
+    return ImageTk.PhotoImage(img)
+
+# display image
+def display_thumbnails():
+    # Clear the thumbnail frame
+    for widget in thumbnail_frame.winfo_children():
+        widget.destroy()
+
+    
+    for name, path in image_paths.items():
+        if os.path.isfile(path):
+            thumbnail_img = create_thumbnail(path)
+            
+            
+            button = tk.Button(thumbnail_frame, image=thumbnail_img, command=lambda path=path: on_thumbnail_click(path))
+            button.image = thumbnail_img  
+            button.pack(side=tk.LEFT, padx=5, pady=5)
+
+# to show the image
+def show_full_image(img_path, size=(100, 100)):
+    img = Image.open(img_path)
+    img = img.resize(size, Image.ANTIALIAS)  # Resize image for display
+    return ImageTk.PhotoImage(img)
+
+# Function to handle thumbnail button click
+def on_thumbnail_click(img_path):
+    try:
+        full_image = show_full_image(img_path)
+        image_label.config(image=full_image)
+        image_label.image = full_image
+
+        # Update the entry with the name of the image
+        item_name = os.path.splitext(os.path.basename(img_path))[0]
+        entry.delete(0, tk.END)
+        entry.insert(0, item_name)
+    except Exception as e:
+        messagebox.showerror("Error", f"An error occurred: {e}")
+
+# function for add an item with a photo to the list
+def add_item():
+    item_name = entry.get().strip()
+    if item_name:
+        # Check is that exist
+        img_path = image_paths.get(item_name)
+        if img_path and os.path.isfile(img_path):
+            shopping_item = {'name': item_name, 'image': img_path}
+            shopping_list.append(shopping_item)
+            
+            # Add item to the list
+            listbox.insert(tk.END, item_name)
+            entry.delete(0, tk.END)
+            image_label.config(image='')  # Clear the displayed image
+        else:
+            messagebox.showwarning("Image Error", "Image file not found for the item.")
+    else:
+        messagebox.showwarning("Input Error", "Please enter an item.")
+
+# Function to search
+def search_item():
+    search_name = search_entry.get().strip()
+    if search_name:
+        img_path = image_paths.get(search_name)
+        if img_path and os.path.isfile(img_path):
+            full_image = show_full_image(img_path)
+            image_label.config(image=full_image)
+            image_label.image = full_image
+            entry.delete(0, tk.END)
+            entry.insert(0, search_name)
+        else:
+            messagebox.showwarning("Search Error", "No item found with the given name.")
+    else:
+        messagebox.showwarning("Input Error", "Please enter an item name to search.")
+
+# Function to show the selected image (Unchanged)
+def show_image():
+    try:
+        index = listbox.curselection()[0]
+        item = shopping_list[index]
+        img_path = item['image']
+        
+        if os.path.isfile(img_path):
+            full_image = show_full_image(img_path)
+            
+            image_label.config(image=full_image)
+            image_label.image = full_image
+        else:
+            messagebox.showerror("File Error", "Image file not found.")
+    except IndexError:
+        messagebox.showwarning("Selection Error", "Please select an item to show its image.")
+    except Exception as e:
+        messagebox.showerror("Error", f"An error occurred: {e}")
+
+# Function to remove the selected item from the list (Unchanged)
+def remove_item():
+    try:
+        index = listbox.curselection()[0]
+        listbox.delete(index)
+        del shopping_list[index]
+        image_label.config(image='')  # Clear the displayed image
+    except IndexError:
+        messagebox.showwarning("Selection Error", "Please select an item to remove.")
+
+# Function to clear all items from the list (Unchanged)
+def clear_list():
+    listbox.delete(0, tk.END)
+    shopping_list.clear()
+    image_label.config(image='')
+
+# Variables
+image_path = tk.StringVar()
+
+# Create the input field for item name
+entry = tk.Entry(window, width=25)
+entry.pack(pady=5)
+
+# Create the search input field
+search_entry = tk.Entry(window, width=25)
+search_entry.pack(pady=5)
+
+# Button to search for an item
+search_button = tk.Button(window, text="Search Item", command=search_item)
+search_button.pack(pady=5)
+
+# Button to add an item
+add_button = tk.Button(window, text="Add Item", command=add_item)
+add_button.pack(pady=5)
+
+# Listbox to display items
+listbox = tk.Listbox(window, width=40)
+listbox.pack(pady=5)
+
+# Button to show the image of the selected item
+show_button = tk.Button(window, text="Show Image", command=show_image)
+show_button.pack(pady=5)
+
+# Label to display the selected item's image
+image_label = tk.Label(window)
+image_label.pack(pady=5)
+
+# Button to remove an item
+remove_button = tk.Button(window, text="Remove Item", command=remove_item)
+remove_button.pack(pady=5)
+
+# Button to clear the list
+clear_button = tk.Button(window, text="Clear List", command=clear_list)
+clear_button.pack(pady=5)
+
+# Display thumbnails of all images
+display_thumbnails()
+
+# Run the GUI event loop
+window.mainloop()
